@@ -81,7 +81,7 @@
     self.textView = [[THContactTextField alloc] init];
     self.textView.delegate = self;
     self.textView.autocorrectionType = UITextAutocorrectionTypeNo;
-    [self selectTextView];
+//    [self selectTextView];
     
     // Add shadow to bottom border
     self.backgroundColor = [UIColor whiteColor];
@@ -238,6 +238,24 @@
     return [self.textView becomeFirstResponder];
 }
 
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    [self.delegate contactPickerDidResignFirstResponder:self];
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    [self.delegate contactPickerDidBecomeFirstResponder:self];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [self.delegate contactPickerShouldReturn:self withText:textField.text];
+    
+    return YES;
+}
+
+- (BOOL)isFirstResponder {
+    return self.textView.isFirstResponder;
+}
+
 #pragma mark - Private functions
 
 - (void)scrollToBottomWithAnimation:(BOOL)animated {
@@ -261,8 +279,8 @@
         return;
     }
     
-    if ([self.delegate respondsToSelector:@selector(contactPickerDidRemoveContact:)]){
-        [self.delegate contactPickerDidRemoveContact:[contact nonretainedObjectValue]];
+    if ([self.delegate respondsToSelector:@selector(contactPicker:didRemoveContact:)]){
+        [self.delegate contactPicker:self didRemoveContact:contact];
     }
     
     [self removeContactByKey:contact];
@@ -423,15 +441,15 @@
         self.selectedContactBubble = [self.contacts objectForKey:[self.contactKeys lastObject]];
         [self.selectedContactBubble select];
     } else {
-        if ([self.delegate respondsToSelector:@selector(contactPickerTextViewDidChange:)]){
-            [self.delegate contactPickerTextViewDidChange:textView.text];
+        if ([self.delegate respondsToSelector:@selector(contactPicker:textViewDidChange:)]){
+            [self.delegate contactPicker:self textViewDidChange:textView.text];
         }
     }
 }
 
 - (void)textFieldDidChange:(THContactTextField *)textView{
-    if ([self.delegate respondsToSelector:@selector(contactPickerTextViewDidChange:)]){
-        [self.delegate contactPickerTextViewDidChange:textView.text];
+    if ([self.delegate respondsToSelector:@selector(contactPicker:textViewDidChange:)]){
+        [self.delegate contactPicker:self textViewDidChange:textView.text];
     }
     
     if ([textView.text isEqualToString:@""] && self.contacts.count == 0){

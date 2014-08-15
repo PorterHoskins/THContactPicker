@@ -33,7 +33,7 @@
 }
 
 - (void)textFieldTextDidChange:(NSNotification *)notification {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textFieldDidChange:)]){
+    if (self == notification.object && self.delegate && [self.delegate respondsToSelector:@selector(textFieldDidChange:)]){
         [self.delegate textFieldDidChange:self];
     }
 }
